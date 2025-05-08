@@ -34,7 +34,7 @@ export const categoryModel: CategoryModel = {
         }
         if(user) {
             const result = (await db.execute({
-                sql: "SELECT category.id as id, category.icon as icon FROM category, cat_proy, project WHERE category.id = cat_id AND proy_id = project.id AND hex(project.user_id) = ? GROUP BY category.id;",
+                sql: "SELECT category.id as id, category.icon as icon FROM category, cat_proy, project WHERE category.id = cat_id AND proy_id = project.id AND HEX(project.user_id) = ? GROUP BY category.id;",
                 args: [user],
             })).rows;
             if(result.length === 0) throw new Error("Invalid token or no categories with that user");
