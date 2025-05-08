@@ -36,27 +36,27 @@ export const projectModel: ProjectModel = {
     getAll: async ({ user, cat, lan }) => {
         if(cat && lan) {
             const result = (await db.execute({
-                sql: "SELECT project.id AS id, repository, website, icon FROM project, lan_proy, language, cat_proy WHERE hex(user_id) = ? AND project.id = lan_proy.proy_id AND lan_id = language.id AND name = ? AND project.id = cat_proy.proy_id AND cat_id = ? GROUP BY project.id;",
+                sql: "SELECT project.id AS id, repository, website, icon FROM project, lan_proy, language, cat_proy WHERE HEX(user_id) = ? AND project.id = lan_proy.proy_id AND lan_id = language.id AND name = ? AND project.id = cat_proy.proy_id AND cat_id = ? GROUP BY project.id;",
                 args: [user, lan, cat],
             })).rows;
             return await toProjects(result);
         }
         if(cat) {
             const result = (await db.execute({
-                sql: "SELECT id, repository, website, icon FROM project, cat_proy WHERE hex(user_id) = ? AND id = proy_id AND cat_id = ? GROUP BY id;",
+                sql: "SELECT id, repository, website, icon FROM project, cat_proy WHERE HEX(user_id) = ? AND id = proy_id AND cat_id = ? GROUP BY id;",
                 args: [user, cat],
             })).rows;
             return await toProjects(result);
         }
         if(lan) {
             const result = (await db.execute({
-                sql: "SELECT project.id AS id, repository, website, icon FROM project, lan_proy, language WHERE hex(user_id) = ? AND project.id = proy_id AND lan_id = language.id AND name = ? GROUP BY project.id;",
+                sql: "SELECT project.id AS id, repository, website, icon FROM project, lan_proy, language WHERE HEX(user_id) = ? AND project.id = proy_id AND lan_id = language.id AND name = ? GROUP BY project.id;",
                 args: [user, lan],
             })).rows;
             return await toProjects(result);
         }
         const result = (await db.execute({
-            sql: "SELECT id, repository, website, icon FROM project WHERE hex(user_id) = ?;",
+            sql: "SELECT id, repository, website, icon FROM project WHERE HEX(user_id) = ?;",
             args: [user],
         })).rows;
         return await toProjects(result);
@@ -67,7 +67,7 @@ export const projectModel: ProjectModel = {
             id: proy,
          } = id;
          const [result] = (await db.execute({
-             sql: "SELECT id, repository, website, icon FROM project WHERE hex(user_id) = ? AND id = ?;",
+             sql: "SELECT id, repository, website, icon FROM project WHERE HEX(user_id) = ? AND id = ?;",
              args: [user, proy],
          })).rows;
          if(!result) throw new Error("No languages with that id made by that user");
@@ -87,7 +87,7 @@ export const projectModel: ProjectModel = {
             const validation = await validateToken(token, user);
             if(!validation) throw new Error("Invalid token");
             const [result] = (await db.execute({
-                sql: "INSERT INTO project (repository, website, icon, user_id) VALUES (?, ?, ?, (SELECT id FROM user WHERE hex(id) = ?)) RETURNING (id, repository, website, icon);",
+                sql: "INSERT INTO project (repository, website, icon, user_id) VALUES (?, ?, ?, (SELECT id FROM user WHERE HEX(id) = ?)) RETURNING (id, repository, website, icon);",
                 args: [repository, website ?? null, icon ?? null, user],
             })).rows;
             const forSql = name.map(() => "(?, (SELECT id FROM translation WHERE name = ?), ?)");
