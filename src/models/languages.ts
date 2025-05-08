@@ -23,7 +23,7 @@ export const languageModel: LanguageModel = {
         }
         if(user){
             const result = (await db.execute({
-                sql: "SELECT language.id as id, language.name as name, image FROM language, lan_proy, project WHERE language.id = lan_id AND proy_id = project.id AND hex(project.user_id) = ? GROUP BY language.id;",
+                sql: "SELECT language.id as id, language.name as name, image FROM language, lan_proy, project WHERE language.id = lan_id AND proy_id = project.id AND HEX(project.user_id) = ? GROUP BY language.id;",
                 args: [user],
             })).rows;
             if(result.length === 0) throw new Error("Invalid token or no languages with that user");
