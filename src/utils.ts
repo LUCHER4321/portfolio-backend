@@ -21,9 +21,9 @@ const parseURL = (url: any, prop: string): string => {
     return url;
 };
 
-const toPartial = <T,>(object: T): (T | undefined) => {
+const toPartial = <T,>(object: () => T): (T | undefined) => {
     try {
-        return object;
+        return object();
     } catch {
         return undefined;
     }
@@ -48,8 +48,8 @@ export const toNewLanguage = (object: any): ToPost<Language> => ({
 
 export const toNewPartialLanguage = (object: any): ToPatch<Language> => ({
     token: parseString(object.token, "token"),
-    name: toPartial(parseString(object.name, "name")),
-    image: toPartial(parseURL(object.image, "image")),
+    name: toPartial(() => parseString(object.name, "name")),
+    image: toPartial(() => parseURL(object.image, "image")),
 });
 
 export const toNewCategory = (object: any): { token: string } & Category => ({
@@ -64,8 +64,8 @@ export const toNewCategory = (object: any): { token: string } & Category => ({
 
 export const toNewPartialCategory = (object: any): ToPatch<Category> => ({
     token: parseString(object.token, "token"),
-    icon: toPartial(parseURL(object.icon, "icon")),
-    name: toPartial(parseList(object.name, "name").map(n => ({
+    icon: toPartial(() => parseURL(object.icon, "icon")),
+    name: toPartial(() => parseList(object.name, "name").map(n => ({
         translation: parseString(n.translation, "translation"),
         name: parseString(n.name, "name"),
     }))),
@@ -78,8 +78,8 @@ export const toNewProject = (object: any): ToPost<Project> => ({
         name: parseString(n.name, "name"),
     })),
     repository: parseURL(object.repository, "repository"),
-    website: toPartial(parseURL(object.website, "website")),
-    icon: toPartial(parseURL(object.icon, "icon")),
+    website: toPartial(() => parseURL(object.website, "website")),
+    icon: toPartial(() => parseURL(object.icon, "icon")),
     languages: parseList(object.languages, "languages").map(l => ({
         id: 0,
         name: l,
@@ -94,19 +94,19 @@ export const toNewProject = (object: any): ToPost<Project> => ({
 
 export const toNewPartialProject = (object: any): ToPatch<Project> => ({
     token: parseString(object.token, "token"),
-    name: toPartial(parseList(object.name, "name").map(n => ({
+    name: toPartial(() => parseList(object.name, "name").map(n => ({
         translation: parseString(n.translation, "translation"),
         name: parseString(n.name, "name"),
     }))),
-    repository: toPartial(parseURL(object.repository, "repository")),
-    website: toPartial(parseURL(object.website, "website")),
-    icon: toPartial(parseURL(object.icon, "icon")),
-    languages: toPartial(parseList(object.languages, "languages").map(l => ({
+    repository: toPartial(() => parseURL(object.repository, "repository")),
+    website: toPartial(() => parseURL(object.website, "website")),
+    icon: toPartial(() => parseURL(object.icon, "icon")),
+    languages: toPartial(() => parseList(object.languages, "languages").map(l => ({
         id: 0,
         name: l,
         image: "",
     }))),
-    categories: toPartial(parseList(object.categories, "categories").map(c => ({
+    categories: toPartial(() => parseList(object.categories, "categories").map(c => ({
         id: c,
         name: [],
         icon: ""
