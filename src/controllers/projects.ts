@@ -7,7 +7,7 @@ export const projectController = (model: ProjectModel): Controller => ({
         const { user } = req.params;
         const { cat, lan } = req.query;
         try {
-            const catId = parseCategoryId(cat?.toString() ?? "");
+            const catId = cat ? parseCategoryId(cat.toString()) : undefined;
             const projects = await model.getAll({ user, cat: catId, lan: lan?.toString() });
             res.json(projects);
         } catch(e: any) {
