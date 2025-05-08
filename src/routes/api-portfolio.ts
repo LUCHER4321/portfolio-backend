@@ -16,12 +16,12 @@ export const createAPI = ({
     projectController
 }: APIProps) => {
     const router = Router();
-    router.get("/tranlsations", async (_, res) => {
+    router.get("/translations", async (_, res) => {
         await getTranslationsController(res);
     });
     router.get("/user/:token", getUserController);
     router.use("/languages", createRouter({ controller: languageController }));
     router.use("/categories", createRouter({ controller: categoryController }));
-    router.use("/projects/:user", createRouter({ controller: projectController }));
+    router.use("/projects", createRouter({ controller: projectController, previous: "/:user" }));
     return router;
 };
