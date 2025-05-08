@@ -25,7 +25,7 @@ const toProject = async (row: Row) => ({
     name: await getNames(row.id as number),
     repository: row.repository,
     website: row.website ?? undefined,
-    icon: row.website ?? undefined,
+    icon: row.icon ?? undefined,
     languages: await getLanguages(row.id as number),
     categories: await getCategories(row.id as number),
 } as Project);
