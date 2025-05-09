@@ -26,7 +26,7 @@ export const languageModel: LanguageModel = {
                 sql: "SELECT language.id as id, language.name as name, image FROM language, lan_proy, project WHERE language.id = lan_id AND proy_id = project.id AND HEX(project.user_id) = ? GROUP BY language.id;",
                 args: [user],
             })).rows;
-            if(result.length === 0) throw new Error("Invalid token or no languages with that user");
+            if(result.length === 0) throw new Error("No languages with that user");
             return toLanguages(result);
         }
         const result = (await db.execute({
