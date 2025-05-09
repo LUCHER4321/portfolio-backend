@@ -2,6 +2,7 @@ import { Row } from "@libsql/client/.";
 import { Category, CategoryId, CategoryModel, Name } from "../types";
 import { db } from "./connection";
 import { validateToken } from "./token";
+import { throwError } from "./throwError";
 
 const getNames = async (id: CategoryId) => {
     const result = (await db.execute({
@@ -87,7 +88,8 @@ export const categoryModel: CategoryModel = {
                     translation: r.translation,
                 })),
             } as Category;
-        } catch {
+        } catch(e: any) {
+            throwError(e, "Invalid token", "Repteated id");
             throw new Error("Error creating category");
         }
     },
@@ -135,7 +137,8 @@ export const categoryModel: CategoryModel = {
                 });
             }
             return await categoryModel.getById({ id });
-        } catch {
+        } catch(e: any) {
+            throwError(e, "Invalid token", "No fields to update");
             throw new Error("Error updating language");
         }
     },
@@ -150,7 +153,8 @@ export const categoryModel: CategoryModel = {
                 args: [id, id, id],
             });
             return result.rowsAffected > 0;
-        } catch {
+        } catch(e: any) {
+            throwError(e, "Invalid token");
             throw new Error("Error deleting category");
         }
     },
