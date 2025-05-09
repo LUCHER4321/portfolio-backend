@@ -6,9 +6,6 @@ export const createApp = ({ api }: { api: Router }) => {
     app.disable("x-powered-by");
     app.use(json());
     app.use(corsMw());
-    app.get("/", (_, res) => {
-        res.json({ message: "Welcome to this API" });
-    });
     app.use("/api/portfolio", api);
     return app;
 };
