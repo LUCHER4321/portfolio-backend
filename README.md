@@ -4,15 +4,17 @@ API para gestionar portfolios de desarrolladores, incluyendo proyectos, categor�
 
 ## Índice
 
-- [Diagrama de Rutas](#diagrama-de-rutas)
-- [Modelo de Base de Datos](#modelo-de-base-de-datos)
-- [Endpoints](#endpoints)
-  - [Base URL](#base-url)
-  - [Rutas Principales](#rutas-principales)
-  - [Subrutas](#subrutas)
-  - [`/languages`](#languages)
-  - [`/categories`](#categories)
-  - [`/projects/:user`](#projectsuser)
+- [Portfolio API](#portfolio-api)
+  - [Índice](#índice)
+  - [Diagrama de Rutas](#diagrama-de-rutas)
+  - [Modelo de Base de Datos](#modelo-de-base-de-datos)
+  - [Endpoints](#endpoints)
+    - [Base URL](#base-url)
+    - [Rutas Principales](#rutas-principales)
+    - [Subrutas](#subrutas)
+      - [`/languages`](#languages)
+      - [`/categories`](#categories)
+      - [`/projects/:user`](#projectsuser)
 
 ## Diagrama de Rutas
 
