@@ -37,7 +37,7 @@ export const categoryModel: CategoryModel = {
                 sql: "SELECT category.id as id, category.icon as icon FROM category, cat_proy, project WHERE category.id = cat_id AND proy_id = project.id AND HEX(project.user_id) = ? GROUP BY category.id;",
                 args: [user],
             })).rows;
-            if(result.length === 0) throw new Error("Invalid token or no categories with that user");
+            if(result.length === 0) throw new Error("No categories with that user");
             return await toCategoties(result);
         }
         const result = (await db.execute({
@@ -51,7 +51,7 @@ export const categoryModel: CategoryModel = {
             sql: "SELECT * FROM category WHERE id = ?;",
             args: [id]
         })).rows;
-        if(!result) throw new Error("No languages with that id");
+        if(!result) throw new Error("No categories with that id");
         return await toCategory(result);
     },
     create: async ({ input }) => {
