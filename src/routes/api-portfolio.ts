@@ -1,19 +1,21 @@
-import { Router } from "express";
+import { Request, Response, Router } from "express";
 import { Controller } from "../types"
 import { createRouter } from "./route";
-import { getTranslationsController } from "../controllers/translations";
-import { getUserController } from "../controllers/user";
 
 interface APIProps {
     languageController: Controller;
     categoryController: Controller;
     projectController: Controller;
+    getTranslationsController: (res: Response) => Promise<void>;
+    getUserController: (req: Request, res: Response) => Promise<void>;
 }
 
 export const createAPI = ({
     languageController,
     categoryController,
-    projectController
+    projectController,
+    getTranslationsController,
+    getUserController,
 }: APIProps) => {
     const router = Router();
     router.get("/", (_, res) => {
