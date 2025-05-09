@@ -70,7 +70,7 @@ export const projectModel: ProjectModel = {
              sql: "SELECT id, repository, website, icon FROM project WHERE HEX(user_id) = ? AND id = ?;",
              args: [user, proy],
          })).rows;
-         if(!result) throw new Error("No languages with that id made by that user");
+         if(!result) throw new Error("No projects with that id made by that user");
          return toProject(result);
     },
     create: async ({ user, input }) => {
