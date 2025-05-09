@@ -2,6 +2,7 @@ import { Row } from "@libsql/client";
 import { Language, LanguageModel } from "../types";
 import { db } from "./connection";
 import { validateToken } from "./token";
+import { throwError } from "./throwError";
 
 const toLanguage = (row: Row) => ({
     id: row.id,
@@ -52,13 +53,13 @@ export const languageModel: LanguageModel = {
         try {
             const validation = await validateToken(token);
             if(!validation) throw new Error("Invalid token");
-            if(!name && !image) throw new Error("No fields to update");
             const [result] = (await db.execute({
                 sql: "INSERT INTO language (name, image) VALUES (?, ?) RETURNING *;",
                 args: [name, image],
             })).rows;
             return toLanguage(result);
-        } catch {
+        } catch(e: any) {
+            throwError(e, "Invalid token");
             throw new Error("Error creating language");
         }
     },
@@ -88,7 +89,8 @@ export const languageModel: LanguageModel = {
                 args,
             })).rows;
             return toLanguage(result);
-        } catch {
+        } catch(e: any) {
+            throwError(e, "Invalid token", "No fields to update");
             throw new Error("Error updating language");
         }
     },
@@ -101,7 +103,8 @@ export const languageModel: LanguageModel = {
                 args: [id, id],
             });
             return result.rowsAffected > 0;
-        } catch {
+        } catch(e: any) {
+            throwError(e, "Invalid token");
             throw new Error("Error deleting language");
         }
     },
