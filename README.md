@@ -10,11 +10,11 @@ API para gestionar portfolios de desarrolladores, incluyendo proyectos, categor�
   - [Modelo de Base de Datos](#modelo-de-base-de-datos)
   - [Endpoints](#endpoints)
     - [Base URL](#base-url)
-    - [Rutas Principales](#rutas-principales)
-    - [Subrutas](#subrutas)
-      - [`/languages`](#languages)
-      - [`/categories`](#categories)
-      - [`/projects/:user`](#projectsuser)
+      - [Rutas Principales](#rutas-principales)
+      - [Subrutas](#subrutas)
+        - [`/languages`](#languages)
+        - [`/categories`](#categories)
+        - [`/projects/:user`](#projectsuser)
 
 ## Diagrama de Rutas
 
@@ -117,16 +117,16 @@ erDiagram
 
 `/api/portfolio`
 
-### Rutas Principales
+#### Rutas Principales
 
 1. **User**
    - `GET /user/:token` - Obtener información del usuario
 2. **Translates**
    - `GET /translates` - Obtener todas las traducciones disponibles
 
-### Subrutas
+#### Subrutas
 
-#### `/languages`
+##### `/languages`
 
 - `GET ?proy&user` - Listar lenguajes (filtrable por proyecto o usuario)
 - `GET /:id` - Obtener un lenguaje específico
@@ -158,7 +158,7 @@ erDiagram
 }
 ```
 
-#### `/categories`
+##### `/categories`
 
 - `GET ?proy&user` - Listar categorías (filtrable por proyecto o usuario)
 - `GET /:id` - Obtener una categoría específica
@@ -201,7 +201,7 @@ erDiagram
 }
 ```
 
-#### `/projects/:user`
+##### `/projects/:user`
 
 - `GET ?lan&cat` - Listar proyectos (filtrable por lenguaje o categoría)
 - `GET /:id`- Obtener un proyecto específico
