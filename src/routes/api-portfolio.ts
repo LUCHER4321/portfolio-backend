@@ -19,6 +19,9 @@ export const createAPI = ({
     router.get("/translations", async (_, res) => {
         await getTranslationsController(res);
     });
+    router.get("/", (_, res) => {
+        res.json({ message: "Welcome to this API" });
+    });
     router.get("/user/:token", getUserController);
     router.use("/languages", createRouter({ controller: languageController }));
     router.use("/categories", createRouter({ controller: categoryController }));
