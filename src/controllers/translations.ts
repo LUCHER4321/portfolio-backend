@@ -1,7 +1,6 @@
 import { Response } from "express";
-import { getTranslations } from "../models/translations";
 
-export const getTranslationsController = async (res: Response) => {
+export const getTranslationsController = (getTranslations: () => Promise<string[]>) => async (res: Response) => {
     try {
         const translations = await getTranslations();
         res.json(translations);
