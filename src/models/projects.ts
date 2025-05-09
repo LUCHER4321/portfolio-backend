@@ -4,6 +4,7 @@ import { categoryModel } from "./categories";
 import { db } from "./connection";
 import { languageModel } from "./languages";
 import { validateToken } from "./token";
+import { throwError } from "./throwError";
 
 const getNames = async (id: number) => {
     const result = (await db.execute({
@@ -120,7 +121,8 @@ export const projectModel: ProjectModel = {
                 languages: await getLanguages(Number(result.id)),
                 categories: await getCategories(Number(result.id)),
             } as Project;
-        } catch {
+        } catch(e: any) {
+            throwError(e, "Invalid token");
             throw new Error("Error creating project");
         }
     },
@@ -227,7 +229,8 @@ export const projectModel: ProjectModel = {
                 });
             }
             return await toProject(result);
-         } catch {
+         } catch(e: any) {
+            throwError(e, "Invalid token", "No fields to update");
             throw new Error("Error updating project");
          }
     },
@@ -243,7 +246,8 @@ export const projectModel: ProjectModel = {
                 args: [id.id, id.id, id.id, id.id],
             });
             return result.rowsAffected > 0;
-        } catch {
+        } catch(e: any) {
+            throwError(e, "Invalid token");
             throw new Error("Error deleting project");
         }
     },
