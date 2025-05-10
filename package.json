@@ -5,6 +5,7 @@
   "scripts": {
     "tsc": "tsc",
     "tsc:init": "tsc --init",
+    "build": "tsc",
     "start": "node build/index.js",
     "dev": "ts-node-dev src/index.ts",
     "test": "echo \"Error: no test specified\" && exit 1"
