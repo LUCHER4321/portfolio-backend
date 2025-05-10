@@ -1,8 +1,5 @@
 import cors from "cors";
-
-const ACCEPTED_ORIGINS = [
-    "https://lucher4321.github.io/",
-];
+import { ACCEPTED_ORIGINS } from "../config";
 
 export const corsMw = ({ acceptedOrigins = ACCEPTED_ORIGINS }: { acceptedOrigins?: string[] } = {}) => cors({
     origin: (origin, callback) => {
