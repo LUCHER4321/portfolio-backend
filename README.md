@@ -148,7 +148,8 @@ erDiagram
 #### Rutas Principales
 
 - `GET /user/:token` - Obtener información del usuario
-  **Respuesta**
+
+**Respuesta:**
 
 ```json
 {
@@ -158,7 +159,8 @@ erDiagram
 ```
 
 - `GET /translates` - Obtener todos los idiomas disponibles
-  **Respuesta**
+
+**Respuesta:**
 
 ```json
 ["string"]
@@ -169,7 +171,8 @@ erDiagram
 ##### `/languages`
 
 - `GET ?proy&user` - Listar lenguajes (filtrable por proyecto o usuario)
-  **Respuesta:**
+
+**Respuesta:**
 
 ```json
 [
@@ -182,7 +185,8 @@ erDiagram
 ```
 
 - `GET /:id` - Obtener un lenguaje específico
-  **Respuesta:**
+
+**Respuesta:**
 
 ```json
 {
@@ -249,7 +253,8 @@ erDiagram
 ##### `/categories`
 
 - `GET ?proy&user` - Listar categorías (filtrable por proyecto o usuario)
-  **Respuesta:**
+
+**Respuesta:**
 
 ```json
 [
@@ -267,7 +272,8 @@ erDiagram
 ```
 
 - `GET /:id` - Obtener una categoría específica
-  **Respuesta:**
+
+**Respuesta:**
 
 ```json
 {
@@ -360,7 +366,8 @@ erDiagram
 ##### `/projects/:user`
 
 - `GET ?lan&cat` - Listar proyectos (filtrable por lenguaje o categoría)
-  **Respuesta:**
+
+**Respuesta:**
 
 ```json
 [
@@ -399,7 +406,8 @@ erDiagram
 ```
 
 - `GET /:id`- Obtener un proyecto específico
-  **Respuesta:**
+
+**Respuesta:**
 
 ```json
 {
