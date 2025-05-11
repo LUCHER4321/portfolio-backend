@@ -193,7 +193,8 @@ erDiagram
 ```
 
 - `POST /` - Crear nuevo lenguaje
-  **Body:**
+
+**Body:**
 
 ```json
 {
@@ -214,7 +215,8 @@ erDiagram
 ```
 
 - `PATCH /:id` - Actualizar lenguaje
-  **Body:**
+
+**Body:**
 
 ```json
 {
@@ -235,7 +237,8 @@ erDiagram
 ```
 
 - `DELETE /:id` - Eliminar lenguaje
-  **Body:**
+
+**Body:**
 
 ```json
 {
@@ -280,7 +283,8 @@ erDiagram
 ```
 
 - `POST /` - Crear nueva categoría
-  **Body:**
+
+**Body:**
 
 ```json
 {
@@ -312,7 +316,8 @@ erDiagram
 ```
 
 - `PATCH /:id` - Actualizar categoría
-  **Body:**
+
+**Body:**
 
 ```json
 {
@@ -343,7 +348,8 @@ erDiagram
 ```
 
 - `DELETE /:id` - Eliminar categoría
-  **Body:**
+
+**Body:**
 
 ```json
 {
@@ -430,7 +436,8 @@ erDiagram
 ```
 
 - `POST /` - Crear nuevo proyecto
-  **Body:**
+
+**Body:**
 
 ```json
 {
@@ -486,7 +493,8 @@ erDiagram
 ```
 
 - `PATCH /:id` - Actualizar proyecto
-  **Body:**
+
+**Body:**
 
 ```json
 {
@@ -542,7 +550,8 @@ erDiagram
 ```
 
 - `DELETE /:id` - Eliminar proyecto
-  **Body:**
+
+**Body:**
 
 ```json
 {
