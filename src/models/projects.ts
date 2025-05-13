@@ -88,13 +88,13 @@ export const projectModel: ProjectModel = {
             const validation = await validateToken(token, user);
             if(!validation) throw new Error("Invalid token");
             const [result] = (await db.execute({
-                sql: "INSERT INTO project (repository, website, icon, user_id) VALUES (?, ?, ?, (SELECT id FROM user WHERE HEX(id) = ?)) RETURNING (id, repository, website, icon);",
+                sql: "INSERT INTO project (repository, website, icon, user_id) VALUES (?, ?, ?, (SELECT id FROM user WHERE HEX(id) = ?)) RETURNING id, repository, website, icon;",
                 args: [repository, website ?? null, icon ?? null, user],
             })).rows;
             const forSql = name.map(() => "(?, (SELECT id FROM translation WHERE name = ?), ?)");
             const forArgs = name.flatMap(n => [n.name, n.translation, result.id]);
             const resultName = (await db.execute({
-                sql: `INSERT INTO proy_name (name, tran_id, proy_id) VALUES ${forSql.join(", ")} RETURNING (proy_name.name as name, (SELECT translation.name FROM translation WHERE translation.id = tran_id) as translation);`,
+                sql: `INSERT INTO proy_name (name, tran_id, proy_id) VALUES ${forSql.join(", ")} RETURNING proy_name.name as name, (SELECT translation.name FROM translation WHERE translation.id = tran_id) as translation;`,
                 args: forArgs,
             })).rows;
             const forSqlCat = categories.map(() => "(?, ?)");
