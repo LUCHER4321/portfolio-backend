@@ -82,11 +82,11 @@ export const toNewProject = (object: any): ToPost<Project> => ({
     icon: toPartial(() => parseURL(object.icon, "icon")),
     languages: parseList(object.languages, "languages").map(l => ({
         id: 0,
-        name: l,
+        name: parseString(l, "language"),
         image: "",
     })),
     categories: parseList(object.categories, "categories").map(c => ({
-        id: c,
+        id: parseCategoryId(c),
         name: [],
         icon: ""
     })),
