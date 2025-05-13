@@ -77,7 +77,7 @@ export const categoryModel: CategoryModel = {
             const forSql = name.map(() => "(?, (SELECT id FROM translation WHERE name = ?), ?)");
             const args = name.flatMap(n => [n.name, n.translation, id]);
             const catResult = (await db.execute({
-                sql: `INSERT INTO cat_name (name, tran_id, cat_id) VALUES ${forSql.join(", ")} RETURNING (cat_name.name as name, (SELECT translation.name FROM translation WHERE translation.id = tran_id) as translation);`,
+                sql: `INSERT INTO cat_name (name, tran_id, cat_id) VALUES ${forSql.join(", ")} RETURNING cat_name.name as name, (SELECT translation.name FROM translation WHERE translation.id = tran_id) as translation;`,
                 args,
             })).rows;
             return {
