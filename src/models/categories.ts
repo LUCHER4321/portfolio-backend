@@ -118,22 +118,17 @@ export const categoryModel: CategoryModel = {
                     name.map(n => n.translation),
                     name.flatMap(n => [n.translation, n.name]),
                 ];
-                const sql = `DELETE FROM cat_name WHERE cat_id = ? AND tran_id NOT IN (SELECT id FROM translation WHERE translation.name IN (${forSql[0].join(", ")}));
-                UPDATE cat_name SET cat_name.name = CASE translation.name ${forSql[1].join(" ")} END FROM translation WHERE AND tran_id = translation.id AND cat_id = ? AND translation.name IN (${forSql[0].join(", ")});
-                INSERT INTO cat_name (name, tran_id, cat_id) SELECT CASE translation.name ${forSql[1].join(" ")} END, translation.id, ? FROM translation LEFT JOIN cat_name ON tran_id = translation.id AND cat_id = ? WHERE translation.name IN (${forSql[0].join(", ")}) AND tran_id IS NULL;`;
-                const args = [
-                    id,
-                    ...forArgs[0],
-                    ...forArgs[1],
-                    id,
-                    ...forArgs[1],
-                    id,
-                    id,
-                    ...forArgs[0],
-                ];
                 await db.execute({
-                    sql,
-                    args,
+                    sql: `DELETE FROM cat_name WHERE cat_id = ? AND tran_id NOT IN (SELECT id FROM translation WHERE translation.name IN (${forSql[0].join(", ")}));`,
+                    args: [id, ...forArgs[0]],
+                });
+                await db.execute({
+                    sql: `UPDATE cat_name SET cat_name.name = CASE translation.name ${forSql[1].join(" ")} END FROM translation WHERE AND tran_id = translation.id AND cat_id = ? AND translation.name IN (${forSql[0].join(", ")});`,
+                    args: [...forArgs[1], id, ...forArgs[0]],
+                });
+                await db.execute({
+                    sql: `INSERT INTO cat_name (name, tran_id, cat_id) SELECT CASE translation.name ${forSql[1].join(" ")} END, translation.id, ? FROM translation LEFT JOIN cat_name ON tran_id = translation.id AND cat_id = ? WHERE translation.name IN (${forSql[0].join(", ")}) AND tran_id IS NULL;`,
+                    args: [...forArgs[1], id, id, ...forArgs[0]],
                 });
             }
             return await categoryModel.getById({ id });
@@ -146,13 +141,16 @@ export const categoryModel: CategoryModel = {
         try {
             const validation = await validateToken(token);
             if(!validation) throw new Error("Invalid token");
-            const result = await db.execute({
-                sql: `DELETE FROM cat_name WHERE cat_id = ?;
-                DELETE FROM cat_proy WHERE cat_id = ?;
-                DELETE FROM category WHERE id = ?;`,
-                args: [id, id, id],
-            });
-            return result.rowsAffected > 0;
+            const deleteSql = [
+                "DELETE FROM cat_name WHERE cat_id = ?;",
+                "DELETE FROM cat_proy WHERE cat_id = ?;",
+                "DELETE FROM category WHERE id = ?;",
+            ];
+            const result = await Promise.all(deleteSql.map(sql => db.execute({
+                sql,
+                args: [id],
+            })));
+            return result.map(r => r.rowsAffected).reduce((a, b) => a + b) > 0;
         } catch(e: any) {
             throwError(e, "Invalid token");
             throw new Error("Error deleting category");

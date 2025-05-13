@@ -98,11 +98,15 @@ export const languageModel: LanguageModel = {
         try{
             const validation = await validateToken(token);
             if(!validation) throw new Error("Invalid token");
-            const result = await db.execute({
-                sql: "DELETE FROM lan_proy WHERE lan_id = ?;DELETE FROM language WHERE id = ?;",
-                args: [id, id],
-            });
-            return result.rowsAffected > 0;
+            const deleteSql = [
+                "DELETE FROM lan_proy WHERE lan_id = ?;",
+                "DELETE FROM language WHERE id = ?;",
+            ];
+            const result = await Promise.all(deleteSql.map(sql => db.execute({
+                sql,
+                args: [id],
+            })));
+            return result.map(r => r.rowsAffected).reduce((a, b) => a + b) > 0;
         } catch(e: any) {
             throwError(e, "Invalid token");
             throw new Error("Error deleting language");

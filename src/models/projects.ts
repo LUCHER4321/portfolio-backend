@@ -156,8 +156,8 @@ export const projectModel: ProjectModel = {
             args.push(id.id);
             if(fields.length === 0 && !name && !languages && !categories) throw new Error("No fields to update");
             const [result] = (await db.execute({
-                sql: `UPDATE project SET ${fields.join(", ")} WHERE id = ? RETURNING *;`,
-                args,
+                sql: fields.length > 0 ? `UPDATE project SET ${fields.join(", ")} WHERE id = ? RETURNING *;` : "SELECT * FROM project WHERE id = ?;",
+                args: fields.length > 0 ? args : [id.id],
             })).rows;
             if(name) {
                 const forSql = [
@@ -168,64 +168,41 @@ export const projectModel: ProjectModel = {
                     name.map(n => n.translation),
                     name.flatMap(n => [n.translation, n.name]),
                 ];
-                const sql = `DELETE FROM proy_name WHERE proy_id = ? AND tran_id NOT IN (SELECT id FROM translation WHERE translation.name IN (${forSql[0].join(", ")}));
-                UPDATE proy_name SET proy_name.name = CASE translation.name ${forSql[1].join(" ")} END FROM translation WHERE AND tran_id = translation.id AND proy_id = ? AND translation.name IN (${forSql[0].join(", ")});
-                INSERT INTO proy_name (name, tran_id, proy_id) SELECT CASE translation.name ${forSql[1].join(" ")} END, translation.id, ? FROM translation LEFT JOIN proy_name ON tran_id = translation.id AND proy_id = ? WHERE translation.name IN (${forSql[0].join(", ")}) AND tran_id IS NULL;`;
-                const args = [
-                    id.id,
-                    ...forArgs[0],
-                    ...forArgs[1],
-                    id.id,
-                    ...forArgs[1],
-                    id.id,
-                    id.id,
-                    ...forArgs[0],
-                ];
                 await db.execute({
-                    sql,
-                    args,
+                    sql: `DELETE FROM proy_name WHERE proy_id = ? AND tran_id NOT IN (SELECT id FROM translation WHERE translation.name IN (${forSql[0].join(", ")}));`,
+                    args: [id.id, ...forArgs[0]],
+                });
+                await db.execute({
+                    sql: `UPDATE proy_name SET proy_name.name = CASE translation.name ${forSql[1].join(" ")} END FROM translation WHERE tran_id = translation.id AND proy_id = ? AND translation.name IN (${forSql[0].join(", ")});`,
+                    args: [...forArgs[1], id.id, ...forArgs[0]],
+                });
+                await db.execute({
+                    sql: `INSERT INTO proy_name (name, tran_id, proy_id) SELECT CASE translation.name ${forSql[1].join(" ")} END, translation.id, ? FROM translation LEFT JOIN proy_name ON tran_id = translation.id AND proy_id = ? WHERE translation.name IN (${forSql[0].join(", ")}) AND tran_id IS NULL;`,
+                    args: [id.id, id.id, ...forArgs[0]],
                 });
             }
             if(languages) {
-                const forSql = [
-                    languages.map(() => "?"),
-                ];
-                const forArgs = [
-                    languages.map(l => l.name),
-                ];
-                const sql = `DELETE FROM lan_proy WHERE proy_id = ? AND lan_id NOT IN (SELECT id FROM language WHERE name IN (${forSql[0].join(", ")}));
-                INSERT INTO lan_proy (lan_id, proy_id) SELECT id, ? FROM language WHERE name IN (${forSql[0].join(", ")}) AND id NOT IN (SELECT lan_id FROM lan_proy WHERE proy_id = ?);`;
-                const args = [
-                    id.id,
-                    ...forArgs[0],
-                    id.id,
-                    ...forArgs[0],
-                    id.id,
-                ];
+                const forSql = languages.map(() => "?");
+                const forArgs = languages.map(l => l.name);
                 await db.execute({
-                    sql,
-                    args,
+                    sql : `DELETE FROM lan_proy WHERE proy_id = ? AND lan_id NOT IN (SELECT id FROM language WHERE name IN (${forSql.join(", ")}));`,
+                    args : [id.id, ...forArgs],
+                });
+                await db.execute({
+                    sql : `INSERT INTO lan_proy (lan_id, proy_id) SELECT id, ? FROM language WHERE name IN (${forSql.join(", ")}) AND id NOT IN (SELECT lan_id FROM lan_proy WHERE proy_id = ?);`,
+                    args : [id.id, ...forArgs, id.id],
                 });
             }
             if(categories) {
-                const forSql = [
-                    categories.map(() => "?"),
-                ];
-                const forArgs = [
-                    categories.map(c => c.id),
-                ];
-                const sql = `DELETE FROM cat_proy WHERE proy_id = ? AND cat_id NOT IN (${forSql[0].join(", ")});
-                INSERT INTO cat_proy (cat_id, proy_id) SELECT id, ? FROM category WHERE id IN (${forSql[0].join(", ")}) AND id NOT IN (SELECT cat_id FROM cat_proy WHERE proy_id = ?);`;
-                const args = [
-                    id.id,
-                    ...forArgs[0],
-                    id.id,
-                    ...forArgs[0],
-                    id.id,
-                ];
+                const forSql = categories.map(() => "?");
+                const forArgs = categories.map(c => c.id);
                 await db.execute({
-                    sql,
-                    args,
+                    sql: `DELETE FROM cat_proy WHERE proy_id = ? AND cat_id NOT IN (${forSql.join(", ")});`,
+                    args: [id.id, ...forArgs],
+                });
+                await db.execute({
+                    sql: `INSERT INTO cat_proy (cat_id, proy_id) SELECT id, ? FROM category WHERE id IN (${forSql.join(", ")}) AND id NOT IN (SELECT cat_id FROM cat_proy WHERE proy_id = ?);`,
+                    args: [id.id, ...forArgs, id.id],
                 });
             }
             return await toProject(result);
@@ -238,14 +215,17 @@ export const projectModel: ProjectModel = {
         try {
             const validation = await validateToken(token);
             if(!validation) throw new Error("Invalid token");
-            const result = await db.execute({
-                sql: `DELETE FROM proy_name WHERE proy_id = ?;
-                DELETE FROM cat_proy WHERE proy_id = ?;
-                DELETE FROM lan_proy WHERE proy_id = ?;
-                DELETE FROM project WHERE id = ?;`,
-                args: [id.id, id.id, id.id, id.id],
-            });
-            return result.rowsAffected > 0;
+            const deleteSql = [
+                "DELETE FROM proy_name WHERE proy_id = ?;",
+                "DELETE FROM cat_proy WHERE proy_id = ?;",
+                "DELETE FROM lan_proy WHERE proy_id = ?;",
+                "DELETE FROM project WHERE id = ?;",
+            ];
+            const result = await Promise.all(deleteSql.map(sql => db.execute({
+                sql,
+                args: [id.id],
+            })));
+            return result.map(r => r.rowsAffected).reduce((a, b) => a + b) > 0;
         } catch(e: any) {
             throwError(e, "Invalid token");
             throw new Error("Error deleting project");
