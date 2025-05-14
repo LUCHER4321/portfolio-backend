@@ -160,26 +160,39 @@ export const projectModel: ProjectModel = {
                 args: fields.length > 0 ? args : [id.id],
             })).rows;
             if(name) {
-                const forSql = [
-                    name.map(() => "?"),
-                    name.map(() => "WHEN ? THEN ?"),
-                ];
-                const forArgs = [
-                    name.map(n => n.translation),
-                    name.flatMap(n => [n.translation, n.name]),
-                ];
+                const translations = name.map(n => n.translation);
                 await db.execute({
-                    sql: `DELETE FROM proy_name WHERE proy_id = ? AND tran_id NOT IN (SELECT id FROM translation WHERE translation.name IN (${forSql[0].join(", ")}));`,
-                    args: [id.id, ...forArgs[0]],
+                    sql: `DELETE FROM proy_name 
+                        WHERE proy_id = ? 
+                        AND tran_id NOT IN (
+                            SELECT id FROM translation 
+                            WHERE name IN (${translations.map(() => '?').join(',')})
+                        )`,
+                    args: [id.id, ...translations]
                 });
-                await db.execute({
-                    sql: `UPDATE proy_name SET proy_name.name = CASE translation.name ${forSql[1].join(" ")} END FROM translation WHERE tran_id = translation.id AND proy_id = ? AND translation.name IN (${forSql[0].join(", ")});`,
-                    args: [...forArgs[1], id.id, ...forArgs[0]],
-                });
-                await db.execute({
-                    sql: `INSERT INTO proy_name (name, tran_id, proy_id) SELECT CASE translation.name ${forSql[1].join(" ")} END, translation.id, ? FROM translation LEFT JOIN proy_name ON tran_id = translation.id AND proy_id = ? WHERE translation.name IN (${forSql[0].join(", ")}) AND tran_id IS NULL;`,
-                    args: [id.id, id.id, ...forArgs[0]],
-                });
+                for (const n of name) {
+                    await db.execute({
+                        sql: `UPDATE proy_name 
+                            SET name = ? 
+                            WHERE proy_id = ? 
+                            AND tran_id = (SELECT id FROM translation WHERE name = ?)`,
+                        args: [n.name, id.id, n.translation]
+                    });
+                }
+                for (const n of name) {
+                    await db.execute({
+                        sql: `INSERT INTO proy_name (name, tran_id, proy_id)
+                            SELECT ?, id, ?
+                            FROM translation
+                            WHERE name = ?
+                            AND NOT EXISTS (
+                                SELECT 1 FROM proy_name 
+                                WHERE proy_id = ? 
+                                AND tran_id = translation.id
+                            )`,
+                        args: [n.name, id.id, n.translation, id.id]
+                    });
+                }
             }
             if(languages) {
                 const forSql = languages.map(() => "?");
