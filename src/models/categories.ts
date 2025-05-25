@@ -111,30 +111,30 @@ export const categoryModel: CategoryModel = {
             }
             if(name) {
                 const forSql = [
-                    name.map(() => "?"),
-                    name.map(() => "WHEN ? THEN ?"),
+                    name.map(() => "?").join(", "),
+                    name.map(() => "WHEN ? THEN ?").join(" "),
                 ];
                 const forArgs = [
                     name.map(n => n.translation),
                     name.flatMap(n => [n.translation, n.name]),
                 ];
                 await db.execute({
-                    sql: `DELETE FROM cat_name WHERE cat_id = ? AND tran_id NOT IN (SELECT id FROM translation WHERE translation.name IN (${forSql[0].join(", ")}));`,
+                    sql: `DELETE FROM cat_name WHERE cat_id = ? AND tran_id NOT IN (SELECT id FROM translation WHERE name IN (${forSql[0]}));`,
                     args: [id, ...forArgs[0]],
                 });
                 await db.execute({
-                    sql: `UPDATE cat_name SET cat_name.name = CASE translation.name ${forSql[1].join(" ")} END FROM translation WHERE AND tran_id = translation.id AND cat_id = ? AND translation.name IN (${forSql[0].join(", ")});`,
+                    sql: `UPDATE cat_name SET name = CASE translation.name ${forSql[1]} END FROM translation WHERE tran_id = translation.id AND cat_id = ? AND translation.name IN (${forSql[0]});`,
                     args: [...forArgs[1], id, ...forArgs[0]],
                 });
                 await db.execute({
-                    sql: `INSERT INTO cat_name (name, tran_id, cat_id) SELECT CASE translation.name ${forSql[1].join(" ")} END, translation.id, ? FROM translation LEFT JOIN cat_name ON tran_id = translation.id AND cat_id = ? WHERE translation.name IN (${forSql[0].join(", ")}) AND tran_id IS NULL;`,
+                    sql: `INSERT INTO cat_name (name, tran_id, cat_id) SELECT CASE translation.name ${forSql[1]} END, translation.id, ? FROM translation LEFT JOIN cat_name ON tran_id = translation.id AND cat_id = ? WHERE translation.name IN (${forSql[0]}) AND tran_id IS NULL;`,
                     args: [...forArgs[1], id, id, ...forArgs[0]],
                 });
             }
             return await categoryModel.getById({ id });
         } catch(e: any) {
             throwError(e, "Invalid token", "No fields to update");
-            throw new Error("Error updating language");
+            throw new Error("Error updating category");
         }
     },
     delete: async ({ id, token }) => {
