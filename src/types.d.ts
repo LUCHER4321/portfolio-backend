@@ -8,6 +8,7 @@ export type CategoryId = `${Letter}${Letter}${Digit}${Digit}`;
 
 export interface Name {
     translation: string;
+    description?: string;
     name: string;
 }
 
