@@ -8,12 +8,13 @@ import { throwError } from "./throwError";
 
 const getNames = async (id: number) => {
     const result = (await db.execute({
-        sql: "SELECT translation.name as translation, proy_name.name as name FROM translation, proy_name WHERE tran_id = translation.id AND proy_id = ? GROUP BY translation.id;",
+        sql: "SELECT translation.name as translation, proy_name.name as name, description FROM translation, proy_name WHERE tran_id = translation.id AND proy_id = ? GROUP BY translation.id;",
         args: [id],
     })).rows;
     return result.map(r => ({
         translation: r.translation,
-        name: r.name
+        name: r.name,
+        description: r.description
     }) as Name);
 };
 
@@ -72,7 +73,7 @@ export const projectModel: ProjectModel = {
              args: [user, proy],
          })).rows;
          if(!result) throw new Error("No projects with that id made by that user");
-         return toProject(result);
+         return await toProject(result);
     },
     create: async ({ user, input }) => {
         const {
@@ -91,10 +92,10 @@ export const projectModel: ProjectModel = {
                 sql: "INSERT INTO project (repository, website, icon, user_id) VALUES (?, ?, ?, (SELECT id FROM user WHERE HEX(id) = ?)) RETURNING id, repository, website, icon;",
                 args: [repository, website ?? null, icon ?? null, user],
             })).rows;
-            const forSql = name.map(() => "(?, (SELECT id FROM translation WHERE name = ?), ?)");
-            const forArgs = name.flatMap(n => [n.name, n.translation, result.id]);
+            const forSql = name.map(() => "(?, ?, (SELECT id FROM translation WHERE name = ?), ?)");
+            const forArgs = name.flatMap(n => [n.name, n.description ?? null, n.translation, result.id]);
             const resultName = (await db.execute({
-                sql: `INSERT INTO proy_name (name, tran_id, proy_id) VALUES ${forSql.join(", ")} RETURNING proy_name.name as name, (SELECT translation.name FROM translation WHERE translation.id = tran_id) as translation;`,
+                sql: `INSERT INTO proy_name (name, description, tran_id, proy_id) VALUES ${forSql.join(", ")} RETURNING proy_name.name as name, (SELECT translation.name FROM translation WHERE translation.id = tran_id) as translation;`,
                 args: forArgs,
             })).rows;
             const forSqlCat = categories.map(() => "(?, ?)");
@@ -173,16 +174,17 @@ export const projectModel: ProjectModel = {
                 for (const n of name) {
                     await db.execute({
                         sql: `UPDATE proy_name 
-                            SET name = ? 
+                            SET name = ?, 
+                            description = ?
                             WHERE proy_id = ? 
                             AND tran_id = (SELECT id FROM translation WHERE name = ?)`,
-                        args: [n.name, id.id, n.translation]
+                        args: [n.name, n.description ?? null, id.id, n.translation]
                     });
                 }
                 for (const n of name) {
                     await db.execute({
-                        sql: `INSERT INTO proy_name (name, tran_id, proy_id)
-                            SELECT ?, id, ?
+                        sql: `INSERT INTO proy_name (name, description, tran_id, proy_id)
+                            SELECT ?, ?, id, ?
                             FROM translation
                             WHERE name = ?
                             AND NOT EXISTS (
@@ -190,7 +192,7 @@ export const projectModel: ProjectModel = {
                                 WHERE proy_id = ? 
                                 AND tran_id = translation.id
                             )`,
-                        args: [n.name, id.id, n.translation, id.id]
+                        args: [n.name, n.description ?? null, id.id, n.translation, id.id]
                     });
                 }
             }
