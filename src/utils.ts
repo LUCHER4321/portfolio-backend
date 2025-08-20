@@ -76,6 +76,7 @@ export const toNewProject = (object: any): ToPost<Project> => ({
     name: parseList(object.name, "name").map(n => ({
         translation: parseString(n.translation, "translation"),
         name: parseString(n.name, "name"),
+        description: toPartial(() => parseString(n.description, "description")),
     })),
     repository: parseURL(object.repository, "repository"),
     website: toPartial(() => parseURL(object.website, "website")),
@@ -97,6 +98,7 @@ export const toNewPartialProject = (object: any): ToPatch<Project> => ({
     name: toPartial(() => parseList(object.name, "name").map(n => ({
         translation: parseString(n.translation, "translation"),
         name: parseString(n.name, "name"),
+        description: toPartial(() => parseString(n.description, "description")),
     }))),
     repository: toPartial(() => parseURL(object.repository, "repository")),
     website: toPartial(() => parseURL(object.website, "website")),
