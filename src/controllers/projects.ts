@@ -1,5 +1,5 @@
 import { Controller, ProjectModel } from "../types";
-import { parseCategoryId, toNewPartialProject, toNewProject } from "../utils";
+import { parseCategoryId, toNewPartialProject, toNewProject, updateWebhook } from "../utils";
 
 export const projectController = (model: ProjectModel): Controller => ({
     model,
@@ -29,6 +29,7 @@ export const projectController = (model: ProjectModel): Controller => ({
             const newProject = toNewProject(req.body);
             const project = await model.create({ user, input: newProject });
             res.json(project);
+            await updateWebhook(user, model);
         } catch(e: any){
             res.status(400).json({ message: e.message });
         }
@@ -39,6 +40,7 @@ export const projectController = (model: ProjectModel): Controller => ({
             const newProject = toNewPartialProject(req.body);
             const project = await model.update({ id: { id: +id, user }, input: newProject });
             res.json(project);
+            await updateWebhook(user, model);
         } catch(e: any){
             res.status(400).json({ message: e.message });
         }
@@ -53,5 +55,6 @@ export const projectController = (model: ProjectModel): Controller => ({
             res.status(400).json({ message: e.message });
         }
         res.json({ message: "Project deleted successfully" });
+        await updateWebhook(user, model);
     },
 });
