@@ -1,4 +1,5 @@
-import { Category, CategoryId, Language, Project, ToPatch, ToPost } from "./types";
+import { WEBHOOK } from "./config";
+import { Category, CategoryId, Language, Project, ProjectModel, ToPatch, ToPost } from "./types";
 
 const isString = (str: any): boolean => (typeof str === "string" || str instanceof String);
 
@@ -114,3 +115,14 @@ export const toNewPartialProject = (object: any): ToPatch<Project> => ({
         icon: ""
     }))),
 });
+
+export const updateWebhook = async (user: string, model: ProjectModel) => {
+    const allProjects = await model.getAll({ user });
+    await fetch(WEBHOOK, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ projects: allProjects })
+    }).catch(e => console.error("Failed to update webhook", e));
+};
