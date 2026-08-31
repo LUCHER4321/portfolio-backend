@@ -1,6 +1,6 @@
 import { MAIL, MAILER_USER } from "../config";
 import { ContactModel } from "../types";
-import { transporter } from "./connection";
+import { sendWhatsApp, transporter } from "./connection";
 import { validateToken } from "./token";
 
 export const contactModel: ContactModel = {
@@ -12,8 +12,14 @@ export const contactModel: ContactModel = {
             to: MAIL,
             subject: `Contact mail from ${name} (${email})`,
             text: `Company: ${company}
-            Phone: ${phone}
-            ${message}`
+Phone: ${phone}
+${message}`
         });
+        await fetch(sendWhatsApp(`*Name*: ${name}
+*Email*: ${email}
+*Company*: ${company}
+*Phone*: ${phone}
+${message}
+        `));
     }
 }
