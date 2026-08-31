@@ -8,3 +8,5 @@ export const WEBHOOK = process.env.WH_URL ?? "";
 export const MAILER_USER = process.env.MAILER_USER;
 export const MAILER_PASS = process.env.MAILER_PASS;
 export const MAIL = process.env.CONTACT_MAIL;
+export const PHONE = process.env.CONTACT_PHONE;
+export const CMB_API_KEY = process.env.CALLMEBOT_API_KEY;
