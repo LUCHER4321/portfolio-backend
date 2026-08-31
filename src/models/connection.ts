@@ -1,5 +1,5 @@
 import { createClient } from "@libsql/client";
-import { MAILER_PASS, MAILER_USER, TOKEN, URL } from "../config";
+import { CMB_API_KEY, MAILER_PASS, MAILER_USER, PHONE, TOKEN, URL } from "../config";
 import { createTransport } from "nodemailer";
 
 export const db = createClient({
@@ -24,3 +24,5 @@ transporter.verify()
         console.error("Error configuring email:", (e as Error).message);
         console.error("Details:", e);
     });
+
+export const sendWhatsApp = (message: string) => `https://api.callmebot.com/whatsapp.php?phone=${PHONE}&text=${encodeURIComponent(message)}&apikey=${CMB_API_KEY}`;
