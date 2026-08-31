@@ -5,3 +5,6 @@ export const URL = process.env.DB_URL ?? "";
 export const TOKEN = process.env.DB_TOKEN ?? "";
 export const ACCEPTED_ORIGINS = process.env.ACCEPTED_ORIGINS ? process.env.ACCEPTED_ORIGINS.split("||") : [];
 export const WEBHOOK = process.env.WH_URL ?? "";
+export const MAILER_USER = process.env.MAILER_USER;
+export const MAILER_PASS = process.env.MAILER_PASS;
+export const MAIL = process.env.CONTACT_MAIL;
