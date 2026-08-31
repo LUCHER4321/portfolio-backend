@@ -126,3 +126,12 @@ export const updateWebhook = async (user: string, model: ProjectModel) => {
         body: JSON.stringify({ projects: allProjects })
     }).catch(e => console.error("Failed to update webhook", e));
 };
+
+export const toContact = (object: any) => ({
+    token: parseString(object.token, "token"),
+    name: toPartial(() => parseString(object.name, "name")),
+    company: toPartial(() => parseString(object.company, "company")),
+    email: toPartial(() => parseString(object.email, "email")),
+    phone: toPartial(() => parseString(object.phone, "phone")),
+    message: toPartial(() => parseString(object.message, "message")),
+});
