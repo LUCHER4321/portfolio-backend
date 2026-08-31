@@ -1,6 +1,8 @@
 import { Request, Response, Router } from "express";
 import { Controller } from "../types"
 import { createRouter } from "./route";
+import { contactController } from "../controllers/contact";
+import { contactModel } from "../models/contact";
 
 interface APIProps {
     languageController: Controller;
@@ -28,5 +30,6 @@ export const createAPI = ({
     router.use("/languages", createRouter({ controller: languageController }));
     router.use("/categories", createRouter({ controller: categoryController }));
     router.use("/projects", createRouter({ controller: projectController, previous: "/:user" }));
+    router.post("/contact", contactController({ contactModel }).contact);
     return router;
 };
