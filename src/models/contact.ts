@@ -15,7 +15,8 @@ export const contactModel: ContactModel = {
 Phone: ${phone}
 ${message}`
         });
-        await fetch(sendWhatsApp(`*Name*: ${name}
+    await fetch(sendWhatsApp(`*MESSAGE FROM PORTFOLIO*
+*Name*: ${name}
 *Email*: ${email}
 *Company*: ${company}
 *Phone*: ${phone}
