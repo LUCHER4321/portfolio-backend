@@ -95,3 +95,17 @@ export interface Controller {
     update: (req: Request, res: Response) => Promise;
     delete: (req: Request, res: Response) => Promise;
 }
+
+export interface ContactController {
+    contact: (req: Request, res: Response) => Promise;
+}
+
+export interface ContactModel {
+    contact: (data: { token: string } & Partial<{
+        name: string;
+        company: string;
+        email: string;
+        phone: string;
+        message: string;
+    }>) => Promise;
+}
